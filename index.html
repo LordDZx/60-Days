@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>التزام 60 يوم</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');
+        body {
+            font-family: 'Amiri', serif;
+            background-color: #f8f4e3;
+        }
+        .islamic-pattern {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='%23b8a88a' fill-opacity='0.1'%3E%3Cpath d='M0 0h80v80H0V0zm20 20v40h40V20H20zm20 35a15 15 0 1 1 0-30 15 15 0 0 1 0 30z' /%3E%3C/g%3E%3C/svg%3E");
+        }
+    </style>
+</head>
+<body class="text-right islamic-pattern">
+    <div class="container mx-auto p-4">
+        <h1 class="text-4xl font-bold mb-8 text-center text-green-800">التزام 60 يوم</h1>
+        <p class="text-center mb-6 text-lg text-gray-700">انقر على الأيام لتحديدها كمكتملة. الأيام الخضراء تعني أنها مكتملة.</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white p-6 rounded-lg shadow-md border-2 border-green-800">
+                <h2 class="text-2xl font-semibold mb-4 text-green-800">الصلاة</h2>
+                <div id="prayer-buttons" class="grid grid-cols-6 gap-2 mb-4"></div>
+                <button onclick="resetActivity('prayer')" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors">إعادة تعيين</button>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md border-2 border-green-800">
+                <h2 class="text-2xl font-semibold mb-4 text-green-800">العبادة</h2>
+                <div id="worship-buttons" class="grid grid-cols-6 gap-2 mb-4"></div>
+                <button onclick="resetActivity('worship')" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors">إعادة تعيين</button>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md border-2 border-green-800">
+                <h2 class="text-2xl font-semibold mb-4 text-green-800">قراءة القرآن</h2>
+                <div id="quran-buttons" class="grid grid-cols-6 gap-2 mb-4"></div>
+                <button onclick="resetActivity('quran')" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors">إعادة تعيين</button>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md border-2 border-green-800">
+                <h2 class="text-2xl font-semibold mb-4 text-green-800">تجنب العادات السيئة</h2>
+                <div id="habits-buttons" class="grid grid-cols-6 gap-2 mb-4"></div>
+                <button onclick="resetActivity('habits')" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors">إعادة تعيين</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const activities = ['prayer', 'worship', 'quran', 'habits'];
+        const days = 60;
+        const startDate = new Date('2024-12-29');
+
+        function createButtons(activity) {
+            const container = document.getElementById(`${activity}-buttons`);
+            for (let i = 1; i <= days; i++) {
+                const button = document.createElement('button');
+                const date = new Date(startDate);
+                date.setDate(startDate.getDate() + i - 1);
+                button.innerText = date.getDate().toLocaleString('ar-EG');
+                button.title = date.toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                button.className = 'w-10 h-10 rounded-full text-lg font-bold transition-all duration-300 ease-in-out transform hover:scale-110';
+                button.onclick = () => toggleDay(activity, i);
+                container.appendChild(button);
+            }
+            updateButtonStates(activity);
+        }
+
+        function toggleDay(activity, day) {
+            const key = `${activity}_${day}`;
+            const completed = localStorage.getItem(key) === 'true';
+            localStorage.setItem(key, !completed);
+            updateButtonStates(activity);
+        }
+
+        function updateButtonStates(activity) {
+            const buttons = document.querySelectorAll(`#${activity}-buttons button`);
+            buttons.forEach((button, index) => {
+                const completed = localStorage.getItem(`${activity}_${index + 1}`) === 'true';
+                button.className = `w-10 h-10 rounded-full text-lg font-bold transition-all duration-300 ease-in-out transform hover:scale-110 ${
+                    completed
+                        ? 'bg-green-600 text-white shadow-lg ring-2 ring-green-400'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`;
+            });
+        }
+
+        function resetActivity(activity) {
+            if (confirm(`هل أنت متأكد أنك تريد إعادة تعيين جميع الأيام لنشاط ${activity}؟`)) {
+                for (let i = 1; i <= days; i++) {
+                    localStorage.removeItem(`${activity}_${i}`);
+                }
+                updateButtonStates(activity);
+            }
+        }
+
+        activities.forEach(createButtons);
+    </script>
+</body>
+</html>
